@@ -23,6 +23,7 @@ base16_base2tone_map = {
 }
 
 
+# translate base16 colors to base2tone
 def fix_refs(template):
     return re.sub(
         r'(base\[")(..)',
@@ -31,11 +32,17 @@ def fix_refs(template):
     )
 
 
+# for some unknown reason, base16-builder is not replacing the comment at the
+# head of the files, which makes them invalid bash scripts
+def remove_head_comment(template):
+    return re.sub(r"{#.*#}", "", dark, flags=re.S)
+
+
 # now we need to replace the base16 colors with our base2tone ones
 dark = open("templates/dark.ejs").read()
 light = open("templates/light.ejs").read()
-darkfixed = fix_refs(dark)
-lightfixed = fix_refs(light)
+darkfixed = remove_head_comment(fix_refs(dark))
+lightfixed = remove_head_comment(fix_refs(light))
 
 open("templates/dark_2tone.ejs", "w").write(darkfixed)
 open("templates/light_2tone.ejs", "w").write(lightfixed)
